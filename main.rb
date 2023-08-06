@@ -2,6 +2,7 @@ require 'webrick'
 require 'net/http'
 require 'json'
 require 'cgi'
+require_relative 'calcElo'
 
 class ERConquest < WEBrick::HTTPServlet::AbstractServlet
   CADET_URL = 'https://erconquest.com/casualPlayers.json'
@@ -16,7 +17,14 @@ class ERConquest < WEBrick::HTTPServlet::AbstractServlet
   def conquest(team, nickname)
     response = Net::HTTP.get(select_team(team))
     data = JSON.parse(response)
-    return player(data, nickname)
+
+    if !nickname
+      return {
+        message: 'Missing nickname.'
+      };
+    end
+
+    return player(data, nickname.downcase)
   end 
 
   def select_team(team)
@@ -34,15 +42,19 @@ class ERConquest < WEBrick::HTTPServlet::AbstractServlet
     result = {}
 
     sorted_mmr.each_with_index do |player, index|
-      if player['name'] == nickname
+      if player['name'].downcase == nickname
         result = {
           position: index + 1,
           name: player['name'],
           rank: player['rank'],
-          mmr: player['mmr'],
+          ranked: CalcElo.calcElo(player['mmr']),
           eliminated: player['eliminated']
         }
         break
+      else
+        result = {
+          message: 'Player not found.'
+        }
       end
     end
     return result
