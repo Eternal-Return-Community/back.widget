@@ -3,23 +3,21 @@ module CalcElo
     elo = format_elo(mmr, rank)  
     division = 4 - ((mmr % 1000) / 250).floor
     rp = (mmr % 250)
-  
-    if elo == "Mythril" || elo == "Titan" || elo == "Immortal"
-      return {
-        mmr: mmr,
-        elo: elo,
-        rp: rp,
-        format_elo: "#{elo} - RP: #{mmr % 6000}"
-      }
-    end
-  
-    return {
+
+    result = {
       mmr: mmr,
       elo: elo,
-      division: division,
-      rp: rp,
-      format_elo: "#{elo} #{division} - RP: #{rp}"
+      rp: rp
     }
+  
+    if ["Mythril", "Titan", "Immortal"].include?(elo)
+      result[:format_elo] = "#{elo} - RP: #{mmr % 6000}"
+    else
+      result[:division] = division
+      result[:format_elo] = "#{elo} #{division} - RP: #{rp}"
+    end
+
+    return result
   end
 
   def self.format_elo(mmr, rank)
