@@ -47,7 +47,7 @@ class ERConquest < WEBrick::HTTPServlet::AbstractServlet
           position: index + 1,
           name: player['name'],
           rank: player['rank'],
-          ranked: CalcElo.calcElo(player['mmr']),
+          ranked: CalcElo.calcElo(player['mmr'], player['rank']),
           eliminated: player['eliminated']
         }
         break
